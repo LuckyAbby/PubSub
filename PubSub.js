@@ -27,7 +27,7 @@ class PubSub {
       const subscribers = PubSub.messages[message];
       for(const s in subscribers) {
         if(subscribers.hasOwnProperty(s)) {
-          subscribers[s](message, data);
+          subscribers[s](data);
         }
       }
     }
@@ -70,12 +70,14 @@ class PubSub {
       if (PubSub.messages.hasOwnProperty(m)) {
         const message = PubSub.messages[m];
         if(isToken && message[value]) {
+          console.log('token');
           delete message[value];
           return true;
         }
 
         if(isFunction) {
           for (const t in message) {
+            console.log(message[t] === value);
             if(message.hasOwnProperty(t) && message[t] === value) {
               delete message[t];
               return true;
