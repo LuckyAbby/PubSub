@@ -6,11 +6,11 @@ class PubSub {
     }
     if (!PubSub.messages.hasOwnProperty(message)) {
 	     PubSub.messages[message] = {};
-    } else {
-       const token = 'uid_' + String(++PubSub.lastUid);
-	     PubSub.messages[message][token] = fn;
-       return token;
     }
+    const token = 'uid_' + String(++PubSub.lastUid);
+	  PubSub.messages[message][token] = fn;
+    return token;
+    
   }
 
   // 发布
@@ -18,11 +18,17 @@ class PubSub {
     if(!this.messageHasSubscribers(message)) {
       return false;
     }
-    const messageObj = PubSub.messages[message];
-    for(const t in messageObj) {
-      if(messageObj.hasOwnProperty(t)) {
-        const fn = messageObj[t];
-        setTimeout(fn(data), 0);
+    const deliver = this.deliverFunction(message, data);
+    setTimeout(deliver, 0);
+  }
+
+  deliverFunction(message, data) {
+    return function() {
+      const subscribers = PubSub.messages[message];
+      for(const s in subscribers) {
+        if(subscribers.hasOwnProperty(s)) {
+          subscribers[s](message, data);
+        }
       }
     }
   }
